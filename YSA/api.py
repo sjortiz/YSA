@@ -3,12 +3,14 @@ from flask_restful import Resource, Api
 from resources.features import Features
 from resources.apps import Apps
 from resources.flags import Flags
+from resources.flagstates import FlagStates
 
 app = Flask(__name__)
 api = Api(app)
 features = Features()
 apps = Apps()
 flags = Flags()
+flagstates = FlagStates()
 
 
 class Features(Resource):
@@ -57,13 +59,13 @@ class FlagStates(Resource):
     """
 
     def get(self, app, feature):
-        pass
+        return flagstates.get(app, feature)
 
     def post(self, app, feature):
-        pass
+        return flagstates.post(app, feature)
 
     def delete(self, app, feature):
-        pass
+        return flagstates.delete(app, feature)
 
 
 class Hello(Resource):
@@ -75,8 +77,8 @@ class Hello(Resource):
 
 api.add_resource(Features, '/features', '/features/<feature>')
 api.add_resource(Apps, '/apps', '/apps/<app>')
-api.add_resource(Flags, '/flags', '/status/<app>')
-api.add_resource(FlagStates, '/status/<app>/<feature>')
+api.add_resource(Flags, '/flags', '/flags/<app>')
+api.add_resource(FlagStates, '/flags/status/<app>/<feature>')
 api.add_resource(Hello, '/healtcheck')
 
 if __name__ == '__main__':

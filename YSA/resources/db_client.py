@@ -9,6 +9,6 @@ class DB:
 
         if db == 'mongo':
 
-            conection_string = 'mongodb://0.0.0.0:32770/'
+            conection_string = 'mongodb://mongo:27017/'
             client = MongoClient(conection_string)
             DB.db = client.test_database

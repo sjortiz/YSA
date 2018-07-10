@@ -13,9 +13,10 @@ class Flags(DB):
         return {
             'data': [
                 {
-                    'uid': str(flag.get('_id', '')),
-                    'name': flag.get('name', ''),
+                    'app': flag.get('app'),
+                    'feature': flag.get('feature'),
+                    'status': flag.get('status')
                 }
-                for flag in self.collection.find({"app": app})
+                for flag in self.collection.find({'app': app} if app else None)
             ]
         }
