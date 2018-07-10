@@ -1,4 +1,4 @@
-# YSA - You should ask
+# YSA - You shall ask
 
 Restful API that runs a feature flagging status storage
 to easily allow users to implement feature flagging in their code

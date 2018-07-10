@@ -1,0 +1,27 @@
+sudo: required
+
+language: python
+
+python:
+  - "3.6"
+
+install:
+  - pip install flake8
+
+services:
+  - docker
+
+script:
+
+  - flake8
+  - docker build -t sjortiz/ysa .
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then
+      docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD;
+      docker push sjortiz/ysa;
+    fi
+  - if [ -n "$TRAVIS_TAG" ];then
+      docker tag sjortiz/ysa:latest sjortiz/ysa:$TRAVIS_TAG;
+      docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD;
+      docker push sjortiz/ysa:stable;
+      docker push sjortiz/ysa:$TRAVIS_TAG;
+    fi

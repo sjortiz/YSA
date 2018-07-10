@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  ysa:
+    image: sjortiz/ysa:stable
+    build: .
+    ports:
+      - "8080:8080"
+    networks:
+      - FFAAS
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - FFAAS
+
+networks:
+  FFAAS:
