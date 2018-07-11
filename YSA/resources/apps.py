@@ -8,7 +8,7 @@ class Apps(DB):
 
         self.collection = self.db.apps
 
-    def get(self):
+    def get(self, name=None):
 
         return {
             'data': [
@@ -16,7 +16,9 @@ class Apps(DB):
                     'uid': str(app.get('_id', '')),
                     'name': app.get('name', ''),
                 }
-                for app in self.collection.find()
+                for app in self.collection.find(
+                    {'name': name} if name else {}
+                )
             ]
         }
 

@@ -18,8 +18,8 @@ class Features(Resource):
     and deletion of features.
     """
 
-    def get(self):
-        return features.get()
+    def get(self, feature=None):
+        return features.get(feature)
 
     def post(self, feature):
         return features.post(feature)

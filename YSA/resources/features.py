@@ -8,7 +8,7 @@ class Features(DB):
 
         self.collection = self.db.features
 
-    def get(self):
+    def get(self, name):
 
         return {
             'data': [
@@ -16,7 +16,9 @@ class Features(DB):
                     'uid': str(feature.get('_id', '')),
                     'name': feature.get('name', ''),
                 }
-                for feature in self.collection.find()
+                for feature in self.collection.find(
+                    {'name': name} if name else {}
+                )
             ]
         }
 
