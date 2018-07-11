@@ -13,21 +13,6 @@ flags = Flags()
 flagstates = FlagStates()
 
 
-class Features(Resource):
-    """Returns the list of features, allows creation
-    and deletion of features.
-    """
-
-    def get(self, feature=None):
-        return features.get(feature)
-
-    def post(self, feature):
-        return features.post(feature)
-
-    def delete(self, feature):
-        return features.delete(feature)
-
-
 class Apps(Resource):
     """Returns the list of apps, allows creation
     and deletion of apps.
@@ -41,6 +26,21 @@ class Apps(Resource):
 
     def delete(self, app):
         return apps.delete(apps)
+
+
+class Features(Resource):
+    """Returns the list of features, allows creation
+    and deletion of features.
+    """
+
+    def get(self, feature=None):
+        return features.get(feature)
+
+    def post(self, feature, app):
+        return features.post(feature)
+
+    def delete(self, feature):
+        return features.delete(feature)
 
 
 class Flags(Resource):
@@ -68,18 +68,23 @@ class FlagStates(Resource):
         return flagstates.delete(app, feature)
 
 
-class Hello(Resource):
+class HealthCheck(Resource):
     """Just to see if the app is running"""
 
     def get(self):
         return {'status': 'ok'}, 200
 
 
-api.add_resource(Features, '/features', '/features/<feature>')
+# apps entity routes
 api.add_resource(Apps, '/apps', '/apps/<app>')
+# features entity routes
+api.add_resource(Features, '/features', '/features/<feature>',
+                 '/features/<feature>/<app>')
+# flags entity routes
 api.add_resource(Flags, '/flags', '/flags/<app>')
 api.add_resource(FlagStates, '/flags/status/<app>/<feature>')
-api.add_resource(Hello, '/healtcheck')
+# healt-check routes
+api.add_resource(HealthCheck, '/', '/healthcheck')
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port="8080")

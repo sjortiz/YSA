@@ -1,4 +1,7 @@
 from resources.db_client import DB
+from resources.apps import Apps
+
+apps = Apps()
 
 
 class Features(DB):
@@ -22,23 +25,39 @@ class Features(DB):
             ]
         }
 
-    def post(self, feature):
+    def post(self, feature, app):
 
-        _id = self.collection.insert_one(
-            {
-                'name': feature
-            }
-        ).inserted_id
+        if apps.get(app).get('data', False):
 
-        return {
-            'data': [
-
+            _id = self.collection.insert_one(
                 {
-                    'id': str(_id),
+                    'app': app,
                     'name': feature,
                 }
+            ).inserted_id
+
+            return {
+                'data': [
+
+                    {
+                        'id': str(_id),
+                        'name': feature,
+                    }
+                ]
+            }
+
+        return {
+            'errors': [
+                {
+                    'status': '404',
+                    'source': {'pointer': f'/apps/{app}'},
+                    'title':  'App entry not found',
+                    'details': (
+                        f'The app {app} was is not registrered'
+                    )
+                }
             ]
-        }
+        }, 404
 
     def delete(self, feature):
 
