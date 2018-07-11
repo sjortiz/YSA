@@ -17,6 +17,6 @@ class Flags(DB):
                     'feature': flag.get('feature'),
                     'status': flag.get('status')
                 }
-                for flag in self.collection.find({'app': app} if app else None)
+                for flag in self.collection.find({'app': app} if app else {})
             ]
         }
