@@ -1,5 +1,8 @@
-from resources.db_client import DB
 from pymongo import ReturnDocument
+from resources.db_client import DB
+from resources.features import Features
+
+features = Features()
 
 
 class FlagStates(DB):
@@ -37,11 +40,23 @@ class FlagStates(DB):
 
         data = self.get(app, feature).get('data')
 
-        if data:
-            status = not bool(data[0].get('status', False))
+        if not (data or features.get(feature).get('data')):
 
-        else:
-            status = True
+            return {
+                'errors': [
+                    {
+                        'status': '404',
+                        'source': {'pointer': f'/features/{feature}'},
+                        'title':  'Feature entry not found',
+                        'details': (
+                            f'The feature {feature}'
+                            ' was is not registrered'
+                        )
+                    }
+                ]
+            }, 404
+
+        status = not (bool(data) and data[0].get('status', False))
 
         updater = {'$set': {
             'status': status
@@ -63,7 +78,8 @@ class FlagStates(DB):
                     **result,
                 }
             ]
-        }
+            # response, status
+        }, 200
 
     def delete(self, app, feature):
 
