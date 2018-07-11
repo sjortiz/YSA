@@ -21,6 +21,7 @@ script:
     fi
   - if [ -n "$TRAVIS_TAG" ];then
       docker tag sjortiz/ysa:latest sjortiz/ysa:$TRAVIS_TAG;
+      docker tag sjortiz/ysa:latest sjortiz/ysa:stable;
       docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD;
       docker push sjortiz/ysa:stable;
       docker push sjortiz/ysa:$TRAVIS_TAG;
