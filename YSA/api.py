@@ -18,14 +18,14 @@ class Apps(Resource):
     and deletion of apps.
     """
 
-    def get(self):
-        return apps.get()
+    def get(self, app=None):
+        return apps.get(app)
 
     def post(self, app):
-        return apps.post(apps)
+        return apps.post(app)
 
     def delete(self, app):
-        return apps.delete(apps)
+        return apps.delete(app)
 
 
 class Features(Resource):
@@ -37,9 +37,9 @@ class Features(Resource):
         return features.get(feature)
 
     def post(self, feature, app):
-        return features.post(feature)
+        return features.post(feature, app)
 
-    def delete(self, feature):
+    def delete(self, feature, app):
         return features.delete(feature)
 
 

@@ -11,21 +11,33 @@ class Features(DB):
 
         self.collection = self.db.features
 
-    def get(self, name):
+    def get(self, name, app=None):
+
+        limiter = {}
+
+        if name:
+            limiter.update({'name': name})
+
+        if app:
+            limiter.update({'app': app})
 
         return {
             'data': [
                 {
-                    'uid': str(feature.get('_id', '')),
+                    'id': str(feature.get('_id', '')),
+                    'app': feature.get('app', ''),
                     'name': feature.get('name', ''),
                 }
-                for feature in self.collection.find(
-                    {'name': name} if name else {}
-                )
+                for feature in self.collection.find(limiter)
             ]
         }
 
     def post(self, feature, app):
+
+        data = self.get(feature, app)
+
+        if data.get('data', False):
+            return data
 
         if apps.get(app).get('data', False):
 
@@ -41,6 +53,7 @@ class Features(DB):
 
                     {
                         'id': str(_id),
+                        'app': app,
                         'name': feature,
                     }
                 ]
@@ -49,19 +62,23 @@ class Features(DB):
         return {
             'errors': [
                 {
-                    'status': '404',
+                    'status': '409',
                     'source': {'pointer': f'/apps/{app}'},
                     'title':  'App entry not found',
                     'details': (
-                        f'The app {app} was is not registrered'
+                        f'The app {app} is not registrered'
                     )
                 }
             ]
-        }, 404
+        }, 409
 
-    def delete(self, feature):
+    def delete(self, feature, app):
 
-        result = self.collection.remove({"name": feature})
+        result = self.collection.remove({
+            'name': feature,
+            'app': app,
+        })
+
         deleted = result['n']
 
         return {

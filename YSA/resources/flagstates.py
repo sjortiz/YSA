@@ -40,21 +40,21 @@ class FlagStates(DB):
 
         data = self.get(app, feature).get('data')
 
-        if not (data or features.get(feature).get('data')):
+        if not (data or features.get(feature, app).get('data')):
 
             return {
                 'errors': [
                     {
-                        'status': '404',
+                        'status': '409',
                         'source': {'pointer': f'/features/{feature}'},
                         'title':  'Feature entry not found',
                         'details': (
                             f'The feature {feature}'
-                            ' was is not registrered'
+                            f' is not registrered for the app <<{app}>>'
                         )
                     }
                 ]
-            }, 404
+            }, 409
 
         status = not (bool(data) and data[0].get('status', False))
 

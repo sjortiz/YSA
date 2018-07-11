@@ -13,7 +13,7 @@ class Apps(DB):
         return {
             'data': [
                 {
-                    'uid': str(app.get('_id', '')),
+                    'id': str(app.get('_id', '')),
                     'name': app.get('name', ''),
                 }
                 for app in self.collection.find(
