@@ -1,7 +1,6 @@
 from flask import request
-from flask_jwt_extended import (
-    create_access_token, create_refresh_token)
 from resources.db_client import DB
+from resources.tokens import Tokens
 
 
 class Users(DB):
@@ -16,20 +15,6 @@ class Users(DB):
             {'user': user} if user else {}
         )
 
-    @staticmethod
-    def __generate_access_token(identity):
-        return create_access_token(identity=identity)
-
-    @staticmethod
-    def __generate_refresh_token(identity):
-        return create_refresh_token(identity=identity)
-
-    @classmethod
-    def _refresh_access_token(cls, identity):
-        return {
-            'access_token': cls.__generate_access_token(identity)
-        }, 200
-
     def __validate_credentials(self, user, password):
 
         user_data = self.__query_user(user=user)
@@ -37,10 +22,7 @@ class Users(DB):
         if user_data:
 
             if password == user_data.get('password'):
-                return {
-                    'access_token': self.__generate_access_token(user),
-                    'refresh_token': self.__generate_refresh_token(user)
-                }, 200
+                return Tokens.generate_token_pair(user), 200
 
             return ({
                 'errors': [

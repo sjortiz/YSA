@@ -15,13 +15,19 @@ from resources.flags import Flags
 from resources.flagstates import FlagStates
 from resources.users import Users
 from resources.tokens import Tokens
+
 # Flask configs - adapters
 app = Flask(__name__)
 app.config['BUNDLE_ERRORS'] = True
 api = Api(app)
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=1)
+
+# JWT configs
 app.config['JWT_SECRET_KEY'] = environ.get('JWT_SECRET_KEY', 'default')
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=2)
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = environ.get(
+    'JWT_REFRESH_EXPIRATION', False)
 jwt = JWTManager(app)
+
 # Module object initiaization
 features = Features()
 apps = Apps()
@@ -45,7 +51,6 @@ def set_default_user():
 
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
-
     return tokens.token_blacklisted(decrypted_token)
 
 

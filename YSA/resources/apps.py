@@ -1,4 +1,5 @@
 from resources.db_client import DB
+from resources.tokens import Tokens
 
 
 class Apps(DB):
@@ -24,18 +25,20 @@ class Apps(DB):
 
     def post(self, app):
 
-        _id = self.collection.insert_one(
-            {
-                'name': app
-            }
-        ).inserted_id
+        data = {
+            'name': app,
+            'tokens': Tokens.generate_token_pair(app),
+        }
+
+        self.collection.insert_one(data)
+
+        del data['_id']
 
         return {
             'data': [
 
                 {
-                    'id': str(_id),
-                    'name': app,
+                    **data,
                 }
             ]
         }
