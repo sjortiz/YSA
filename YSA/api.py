@@ -11,8 +11,6 @@ from flask_jwt_extended import (
 # Modules objects import
 from resources.features import Features
 from resources.apps import Apps
-from resources.flags import Flags
-from resources.flagstates import FlagStates
 from resources.users import Users
 from resources.tokens import Tokens
 
@@ -31,8 +29,6 @@ jwt = JWTManager(app)
 # Module object initiaization
 features = Features()
 apps = Apps()
-flags = Flags()
-flagstates = FlagStates()
 users = Users()
 tokens = Tokens()
 
@@ -68,7 +64,7 @@ class Login(Resource):
 
     @jwt_refresh_token_required
     def put(self):
-        return users._refresh_access_token(
+        return tokens._refresh_access_token(
             identity=get_jwt_identity()
         )
 
@@ -111,47 +107,31 @@ class Apps(Resource):
 
 
 class Features(Resource):
-    """Returns the list of features, allows creation
-    and deletion of features.
-    """
+    """Returns the list of features"""
 
-    def get(self, feature=None):
-        return features.get(feature)
-
-    @jwt_required
-    def post(self, feature, app):
-        return features.post(feature, app)
-
-    @jwt_required
-    def delete(self, feature, app):
-        return features.delete(feature)
+    def get(self, app=None, feature=None):
+        # Returns all the features.
+        # If the app is specified returns all the features in the app
+        # If the feature is specified returns
+        return features.get(app=app, feature=feature)
 
 
-class Flags(Resource):
-    """Returns all the flags. If the app is specified
-    returns all the flags by app.
-    """
-
-    def get(self, app=None):
-        return flags.get(app)
-
-
-class FlagStates(Resource):
-    """Returns the status of a flag in an app, allows
-    modification thru the post method of the flag status.
-    Creates the association if it doesn't exist yet.
-    """
-
-    def get(self, app, feature):
-        return flagstates.get(app, feature)
-
+class FeatureMutations(Resource):
+    """allows creation and deletion of features"""
     @jwt_required
     def post(self, app, feature):
-        return flagstates.post(app, feature)
+        return features.post(app=app, feature=feature)
 
     @jwt_required
     def delete(self, app, feature):
-        return flagstates.delete(app, feature)
+        return features.delete(app=app, feature=feature)
+
+
+class StatusMutation(Resource):
+    """Allows mutation of status"""
+    @jwt_required
+    def put(self, app, feature):
+        return features.put(app=app, feature=feature)
 
 
 class HealthCheck(Resource):
@@ -172,11 +152,10 @@ api.add_resource(LogOut, '/logout')
 # apps entity routes
 api.add_resource(Apps, '/apps', '/apps/<app>')
 # features entity routes
-api.add_resource(Features, '/features', '/features/<feature>',
-                 '/features/<feature>/<app>')
-# flags entity routes
-api.add_resource(Flags, '/flags', '/flags/<app>')
-api.add_resource(FlagStates, '/flags/status/<app>/<feature>')
+api.add_resource(Features, '/features', '/features/<app>',
+                 '/features/<app>/<feature>')
+api.add_resource(FeatureMutations, '/feature/<app>/<feature>')
+api.add_resource(StatusMutation, '/status/<app>/<feature>')
 
 
 if __name__ == '__main__':

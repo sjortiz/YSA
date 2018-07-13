@@ -25,6 +25,20 @@ class Apps(DB):
 
     def post(self, app):
 
+        if self.collection.find_one({'name': app}):
+
+            return {
+                'errors': [
+                    {
+                        'status': '409',
+                        'source': {'pointer': f'/app/{app}'},
+                        'title': 'Duplicated app record',
+                        'details': f'The app {app} already exist'
+                    }
+
+                ]
+            }, 409
+
         data = {
             'name': app,
             'tokens': Tokens.generate_token_pair(app),
@@ -41,7 +55,7 @@ class Apps(DB):
                     **data,
                 }
             ]
-        }
+        }, 200
 
     def delete(self, app):
 
