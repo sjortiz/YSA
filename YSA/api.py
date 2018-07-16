@@ -32,6 +32,7 @@ apps = Apps()
 users = Users()
 tokens = Tokens()
 
+# Arguments parsing
 parser = reqparse.RequestParser()
 
 parser.add_argument('user', type=str,  required=True,
@@ -42,11 +43,13 @@ parser.add_argument('password', type=str,  required=True,
 
 @app.before_first_request
 def set_default_user():
+    # Creates a default user if there is not any user
     users._set_default_user()
 
 
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
+    # Cerify if the token is not black-listed
     return tokens.token_blacklisted(decrypted_token)
 
 
@@ -56,30 +59,33 @@ class Login(Resource):
     access to interact with the api.
     Only json request are accepted.
     """
-
     def post(self):
-
+        # Returns user tokens if loged or error if fails
         args = parser.parse_args()
         return users.signin(**args)
 
     @jwt_refresh_token_required
     def put(self):
+        # Refresh jwt token specs jwt_refresh token
         return tokens._refresh_access_token(
             identity=get_jwt_identity()
         )
 
 
 class SignUp(Resource):
-
+    """Register an user."""
     @jwt_required
     def post(self):
-
+        # Creates an user
         args = parser.parse_args()
         return users.signup(**args)
 
 
 class LogOut(Resource):
-
+    """Blacklist the tokens, you must hit it with both methods
+    to enable the full secuirty, if you just want to destroy
+    a missed token hit the corresponding one.
+    """
     @jwt_required
     def post(self):
         return tokens.blacklist_token(get_raw_jwt())
@@ -90,25 +96,27 @@ class LogOut(Resource):
 
 
 class Apps(Resource):
-    """Returns the list of apps, allows creation
-    and deletion of apps.
-    """
-
+    """Returns the list of apps."""
     def get(self, app=None):
+        # Returns all the apps or the app specified
         return apps.get(app)
 
+
+class AppMutations(Resource):
+    """Allows creation and deletion of apps."""
     @jwt_required
     def post(self, app):
+        # Creates a new app
         return apps.post(app)
 
     @jwt_required
     def delete(self, app):
+        # Deletes an app
         return apps.delete(app)
 
 
 class Features(Resource):
-    """Returns the list of features"""
-
+    """Returns the list of features."""
     def get(self, app=None, feature=None):
         # Returns all the features.
         # If the app is specified returns all the features in the app
@@ -120,23 +128,25 @@ class FeatureMutations(Resource):
     """allows creation and deletion of features"""
     @jwt_required
     def post(self, app, feature):
+        # Creates a feature
         return features.post(app=app, feature=feature)
 
     @jwt_required
     def delete(self, app, feature):
+        # Deletes a feature
         return features.delete(app=app, feature=feature)
 
 
 class StatusMutation(Resource):
-    """Allows mutation of status"""
+    """Allows mutation of feature status"""
     @jwt_required
     def put(self, app, feature):
+        # Toggles the feature status
         return features.put(app=app, feature=feature)
 
 
 class HealthCheck(Resource):
-    """Just to see if the app is running"""
-
+    """Confirms if the app is running"""
     def get(self):
         return {'status': 'ok'}, 200
 
@@ -150,13 +160,19 @@ api.add_resource(SignUp, '/signup')
 # log out
 api.add_resource(LogOut, '/logout')
 # apps entity routes
-api.add_resource(Apps, '/apps', '/apps/<app>')
+api.add_resource(Apps, '/apps')
+api.add_resource(AppMutations, '/app/<app>')
 # features entity routes
-api.add_resource(Features, '/features', '/features/<app>',
-                 '/features/<app>/<feature>')
+api.add_resource(Features, '/features', '/features/<app>')
 api.add_resource(FeatureMutations, '/feature/<app>/<feature>')
+# feature status routes
 api.add_resource(StatusMutation, '/status/<app>/<feature>')
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port="8080")
+
+    app.run(
+        debug=environ.get('FFAAS_DEBUG', False),
+        host='0.0.0.0',
+        port="8080",
+    )

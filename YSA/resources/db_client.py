@@ -5,7 +5,7 @@ class DB:
 
     db = None
 
-    def __init__(self, db='mongo'):
+    def __init__(self, db: str='mongo') -> None:
 
         if db == 'mongo':
 

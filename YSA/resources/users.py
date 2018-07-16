@@ -10,13 +10,14 @@ class Users(DB):
         super().__init__()
         self.collection = self.db.users
 
-    def __query_user(self, user=None):
+    def __query_user(self, user: str=None) -> dict:
+        # Looks for an user in the db
         return self.collection.find_one(
             {'user': user} if user else {}
         )
 
-    def __validate_credentials(self, user, password):
-
+    def __validate_credentials(self, user: str, password: str) -> tuple:
+        # Ensure that the credentials provided match the ones in user the table
         user_data = self.__query_user(user=user)
 
         if user_data:
@@ -24,7 +25,7 @@ class Users(DB):
             if password == user_data.get('password'):
                 return Tokens.generate_token_pair(user), 200
 
-            return ({
+            return {
                 'errors': [
                     {
                         'status': '401',
@@ -33,7 +34,7 @@ class Users(DB):
                         'details': f'Wrong password specified'
                     }
                 ]
-            }, 401)
+            }, 401
 
         return {
             'errors': [
@@ -46,8 +47,8 @@ class Users(DB):
             ]
         }, 404
 
-    def signin(self, user, password):
-
+    def signin(self, user: str, password: str)->tuple:
+        # Attempts to log the user in
         if not request.is_json:
 
             return {
@@ -77,8 +78,8 @@ class Users(DB):
             ]
         }, 422
 
-    def signup(self, user, password):
-
+    def signup(self, user: str, password: str) -> tuple:
+        # Creates an user
         data = {
             'user': user,
             'password': password,
@@ -95,6 +96,8 @@ class Users(DB):
             ]
         }, 200
 
-    def _set_default_user(self, user='admin', password='admin'):
+    def _set_default_user(
+            self, user: str='admin', password: str='admin') -> None:
+        # Adds the default user if the user document is empty
         if not self.__query_user():
             self.signup(user, password)

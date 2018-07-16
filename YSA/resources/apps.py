@@ -9,8 +9,9 @@ class Apps(DB):
 
         self.collection = self.db.apps
 
-    def get(self, name=None):
-
+    def get(self, name: str='') -> tuple:
+        # Get a list of all the apps and it's information
+        # Gets the app information if the name is specified
         return {
             'data': [
                 {
@@ -21,9 +22,9 @@ class Apps(DB):
                     {'name': name} if name else {}
                 )
             ]
-        }
+        }, 200
 
-    def post(self, app):
+    def post(self, app: str) -> tuple:
 
         if self.collection.find_one({'name': app}):
 
@@ -57,7 +58,7 @@ class Apps(DB):
             ]
         }, 200
 
-    def delete(self, app):
+    def delete(self, app: str) -> tuple:
 
         result = self.collection.remove({"name": app})
         deleted = result['n']
@@ -69,4 +70,4 @@ class Apps(DB):
                     'deleted': deleted,
                 }
             ]
-        }
+        }, 200
