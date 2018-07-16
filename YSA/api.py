@@ -13,7 +13,7 @@ from resources.features import Features
 from resources.apps import Apps
 from resources.users import Users
 from resources.tokens import Tokens
-
+from resources.groups import Groups
 # Flask configs - adapters
 app = Flask(__name__)
 app.config['BUNDLE_ERRORS'] = True
@@ -31,7 +31,7 @@ features = Features()
 apps = Apps()
 users = Users()
 tokens = Tokens()
-
+groups = Groups()
 # Arguments parsing
 parser = reqparse.RequestParser()
 
@@ -115,26 +115,43 @@ class AppMutations(Resource):
         return apps.delete(app)
 
 
+class Groups(Resource):
+    """Returns the list of groups"""
+    def get(self, app=None, group=None):
+        return groups.get(app=app, group=group)
+
+
+class GroupMutation(Resource):
+    """Allows creation and deletion of apps"""
+    @jwt_required
+    def post(self, app, group):
+        return groups.post(app=app, group=group)
+
+    @jwt_required
+    def delete(self, app, group):
+        return groups.delete(app=app, group=group)
+
+
 class Features(Resource):
     """Returns the list of features."""
-    def get(self, app=None, feature=None):
+    def get(self, group=None, feature=None):
         # Returns all the features.
         # If the app is specified returns all the features in the app
         # If the feature is specified returns
-        return features.get(app=app, feature=feature)
+        return features.get(group=group, feature=feature)
 
 
 class FeatureMutations(Resource):
     """allows creation and deletion of features"""
     @jwt_required
-    def post(self, app, feature):
+    def post(self, group, feature):
         # Creates a feature
-        return features.post(app=app, feature=feature)
+        return features.post(group=group, feature=feature)
 
     @jwt_required
-    def delete(self, app, feature):
+    def delete(self, group, feature):
         # Deletes a feature
-        return features.delete(app=app, feature=feature)
+        return features.delete(group=group, feature=feature)
 
 
 class StatusMutation(Resource):
@@ -162,9 +179,12 @@ api.add_resource(LogOut, '/logout')
 # apps entity routes
 api.add_resource(Apps, '/apps')
 api.add_resource(AppMutations, '/app/<app>')
+# groups entity routes
+api.add_resource(Groups, '/groups', '/groups/<app>')
+api.add_resource(GroupMutation, '/group/<app>/<group>')
 # features entity routes
-api.add_resource(Features, '/features', '/features/<app>')
-api.add_resource(FeatureMutations, '/feature/<app>/<feature>')
+api.add_resource(Features, '/features', '/features/<group>')
+api.add_resource(FeatureMutations, '/feature/<group>/<feature>')
 # feature status routes
 api.add_resource(StatusMutation, '/status/<app>/<feature>')
 

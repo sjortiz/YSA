@@ -1,8 +1,8 @@
 from pymongo import ReturnDocument
 from resources.db_client import DB
-from resources.apps import Apps
+from resources.groups import Groups
 
-apps = Apps()
+groups = Groups()
 
 
 class Features(DB):
@@ -12,12 +12,12 @@ class Features(DB):
 
         self.collection = self.db.features
 
-    def get(self, app: str='', feature: str='') -> tuple:
+    def get(self, group: str='', feature: str='') -> tuple:
 
         limiter = {}
 
-        if app:
-            limiter.update({'app': app})
+        if group:
+            limiter.update({'group': group})
 
         if feature:
             limiter.update({'feature': feature})
@@ -26,7 +26,7 @@ class Features(DB):
             'data': [
                 {
                     'id': str(feature.get('_id', '')),
-                    'app': feature.get('app', ''),
+                    'group': feature.get('group', ''),
                     'feature': feature.get('feature', ''),
                     'status': feature.get('status', False),
                 }
@@ -34,16 +34,16 @@ class Features(DB):
             ]
         }, 200
 
-    def post(self, app: str, feature: str) -> tuple:
+    def post(self, group: str, feature: str) -> tuple:
 
-        data = self.get(app, feature)
+        data = self.get(group, feature)
 
         if data.get('data', False):
             return {
                 'errors': [
                     {
                         'status': '409',
-                        'source': {'pointer': f'/features/{app}/{feature}'},
+                        'source': {'pointer': f'/features/{group}/{feature}'},
                         'title': 'Duplicated feature record',
                         'details': f'The feature {feature} already exist'
                     }
@@ -51,11 +51,11 @@ class Features(DB):
                 ]
             }, 409
 
-        if apps.get(app).get('data', False):
+        if groups.get(group).get('data', False):
 
             _id = self.collection.insert_one(
                 {
-                    'app': app,
+                    'group': group,
                     'feature': feature,
                 }
             ).inserted_id
@@ -65,7 +65,7 @@ class Features(DB):
 
                     {
                         'id': str(_id),
-                        'app': app,
+                        'group': group,
                         'feature': feature,
                         'status': False,
                     }
@@ -76,23 +76,23 @@ class Features(DB):
             'errors': [
                 {
                     'status': '409',
-                    'source': {'pointer': f'/apps/{app}'},
-                    'title':  'App entry not found',
+                    'source': {'pointer': f'/groups/{group}'},
+                    'title':  'group entry not found',
                     'details': (
-                        f'The app {app} is not registrered'
+                        f'The group {group} is not registrered'
                     )
                 }
             ]
         }, 409
 
-    def put(self, app: str, feature: str) -> tuple:
+    def put(self, group: str, feature: str) -> tuple:
 
         _filter = {
-            'app': app,
+            'group': group,
             'feature': feature,
         }
 
-        data = self.get(app, feature).get('data')
+        data = self.get(group, feature).get('data')
 
         if not data:
 
@@ -104,7 +104,7 @@ class Features(DB):
                         'title':  'Feature entry not found',
                         'details': (
                             f'The feature {feature}'
-                            f' is not registrered for the app <<{app}>>'
+                            f' is not registrered for the group <<{group}>>'
                         )
                     }
                 ]
@@ -134,10 +134,10 @@ class Features(DB):
             ]
         }, 200
 
-    def delete(self, app: str, feature: str) -> tuple:
+    def delete(self, group: str, feature: str) -> tuple:
 
         result = self.collection.remove({
-            'app': app,
+            'group': group,
             'feature': feature,
         })
 
