@@ -12,7 +12,7 @@ class Features(DB):
 
         self.collection = self.db.features
 
-    def get(self, app=None, feature=None):
+    def get(self, app: str='', feature: str='') -> tuple:
 
         limiter = {}
 
@@ -32,9 +32,9 @@ class Features(DB):
                 }
                 for feature in self.collection.find(limiter)
             ]
-        }
+        }, 200
 
-    def post(self, app, feature):
+    def post(self, app: str, feature: str) -> tuple:
 
         data = self.get(app, feature)
 
@@ -70,7 +70,7 @@ class Features(DB):
                         'status': False,
                     }
                 ]
-            }
+            }, 200
 
         return {
             'errors': [
@@ -85,7 +85,7 @@ class Features(DB):
             ]
         }, 409
 
-    def put(self, app, feature):
+    def put(self, app: str, feature: str) -> tuple:
 
         _filter = {
             'app': app,
@@ -134,7 +134,7 @@ class Features(DB):
             ]
         }, 200
 
-    def delete(self, app, feature):
+    def delete(self, app: str, feature: str) -> tuple:
 
         result = self.collection.remove({
             'app': app,
@@ -150,4 +150,4 @@ class Features(DB):
                     'deleted': deleted,
                 }
             ]
-        }
+        }, 200
