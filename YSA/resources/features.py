@@ -36,7 +36,7 @@ class Features(DB):
 
     def post(self, group: str, feature: str) -> tuple:
 
-        data = self.get(group, feature)
+        data = self.get(group, feature)[0]
 
         if data.get('data', False):
             return {
@@ -51,7 +51,7 @@ class Features(DB):
                 ]
             }, 409
 
-        if groups.get(group).get('data', False):
+        if groups.get(group=group)[0].get('data', False):
 
             _id = self.collection.insert_one(
                 {
@@ -92,7 +92,7 @@ class Features(DB):
             'feature': feature,
         }
 
-        data = self.get(group, feature).get('data')
+        data = self.get(group, feature)[0].get('data')
 
         if not data:
 
