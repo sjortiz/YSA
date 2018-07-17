@@ -59,6 +59,7 @@ class Login(Resource):
     access to interact with the api.
     Only json request are accepted.
     """
+
     def post(self):
         # Returns user tokens if loged or error if fails
         args = parser.parse_args()
@@ -97,6 +98,7 @@ class LogOut(Resource):
 
 class Apps(Resource):
     """Returns the list of apps."""
+
     def get(self, app=None):
         # Returns all the apps or the app specified
         return apps.get(app)
@@ -117,6 +119,7 @@ class AppMutations(Resource):
 
 class Groups(Resource):
     """Returns the list of groups"""
+
     def get(self, app=None, group=None):
         return groups.get(app=app, group=group)
 
@@ -134,6 +137,7 @@ class GroupMutation(Resource):
 
 class Features(Resource):
     """Returns the list of features."""
+
     def get(self, group=None, feature=None):
         # Returns all the features.
         # If the app is specified returns all the features in the app
@@ -157,13 +161,14 @@ class FeatureMutations(Resource):
 class StatusMutation(Resource):
     """Allows mutation of feature status"""
     @jwt_required
-    def put(self, app, feature):
+    def put(self, group, feature):
         # Toggles the feature status
-        return features.put(app=app, feature=feature)
+        return features.put(group=group, feature=feature)
 
 
 class HealthCheck(Resource):
     """Confirms if the app is running"""
+
     def get(self):
         return {'status': 'ok'}, 200
 
@@ -183,10 +188,11 @@ api.add_resource(AppMutations, '/app/<app>')
 api.add_resource(Groups, '/groups', '/groups/<app>')
 api.add_resource(GroupMutation, '/group/<app>/<group>')
 # features entity routes
-api.add_resource(Features, '/features', '/features/<group>')
+api.add_resource(Features, '/features', '/features/<group>',
+                 '/features/<group>/<feature>')
 api.add_resource(FeatureMutations, '/feature/<group>/<feature>')
 # feature status routes
-api.add_resource(StatusMutation, '/status/<app>/<feature>')
+api.add_resource(StatusMutation, '/status/<group>/<feature>')
 
 
 if __name__ == '__main__':

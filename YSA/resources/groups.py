@@ -35,7 +35,7 @@ class Groups(DB):
 
     def post(self, app: str, group: str) -> tuple:
 
-        data = self.get(app, group)
+        data = self.get(app, group)[0]
 
         if data.get('data', False):
             return {
@@ -50,7 +50,7 @@ class Groups(DB):
                 ]
             }, 409
 
-        if apps.get(app).get('data', False):
+        if apps.get(app)[0].get('data', False):
 
             _id = self.collection.insert_one(
                 {
