@@ -97,7 +97,7 @@ class Users(DB):
         }, 200
 
     def _set_default_user(
-            self, user: str='admin', password: str='admin') -> None:
+            self, user: str='admin@admin.com', password: str='admin') -> None:
         # Adds the default user if the user document is empty
         if not self.__query_user():
             self.signup(user, password)

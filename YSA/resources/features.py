@@ -27,7 +27,7 @@ class Features(DB):
                 {
                     'id': str(feature.get('_id', '')),
                     'group': feature.get('group', ''),
-                    'feature': feature.get('feature', ''),
+                    'name': feature.get('feature', ''),
                     'status': feature.get('status', False),
                 }
                 for feature in self.collection.find(limiter)
@@ -66,7 +66,7 @@ class Features(DB):
                     {
                         'id': str(_id),
                         'group': group,
-                        'feature': feature,
+                        'name': feature,
                         'status': False,
                     }
                 ]
@@ -123,15 +123,13 @@ class Features(DB):
             return_document=ReturnDocument.AFTER,
         )
 
-        del result['_id']
+        result['id'] = str(result.pop('_id'))
+        result['name'] = result.pop('feature', '')
 
         return {
-            'data': [
-
-                {
-                    **result,
-                }
-            ]
+            'data': {
+                **result,
+            }
         }, 200
 
     def delete(self, group: str, feature: str) -> tuple:
@@ -144,10 +142,8 @@ class Features(DB):
         deleted = result['n']
 
         return {
-            'data': [
-                {
-                    'feature': feature,
-                    'deleted': deleted,
-                }
-            ]
+            'data': {
+                'name': feature,
+                'deleted': deleted,
+            }
         }, 200
