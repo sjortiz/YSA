@@ -26,7 +26,7 @@ class Groups(DB):
                 {
                     'id': str(group.get('_id', '')),
                     'app': group.get('app', ''),
-                    'group': group.get('group', ''),
+                    'name': group.get('group', ''),
                     'status': group.get('status', False),
                 }
                 for group in self.collection.find(limiter)

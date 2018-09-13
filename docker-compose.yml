@@ -8,6 +8,11 @@ services:
       - "8080:8080"
     networks:
       - FFAAS
+    environment:
+      FFAAS_DEBUG: "True"
+    volumes:
+      - ./YSA:/app
+
   mongo:
     image: mongo:latest
     ports:

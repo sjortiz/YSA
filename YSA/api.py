@@ -3,6 +3,7 @@ from os import environ
 from datetime import timedelta
 # Third party/flask modules
 from flask import Flask
+from flask_cors import CORS
 from flask_restful import Api, reqparse, Resource
 from flask_jwt_extended import (
     JWTManager, jwt_required, jwt_refresh_token_required,
@@ -18,6 +19,7 @@ from resources.groups import Groups
 app = Flask(__name__)
 app.config['BUNDLE_ERRORS'] = True
 api = Api(app)
+CORS(app)
 
 # JWT configs
 app.config['JWT_SECRET_KEY'] = environ.get('JWT_SECRET_KEY', 'default')
